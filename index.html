@@ -2,158 +2,168 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="description" content="好用的密码生成器">
-    <title>Good Pass</title>
-   	<link rel="manifest" href="manifest.json" />
-    <link rel="shortcut icon" type="image/png" href="./favicon.png" />
-    <link rel="apple-touch-icon" type="image/png" href="/goodpass/apple-touch-icon-180x180.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="msapplication-TileColor" content="#ffc110">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffc110">
+  <meta name="description" content="好用的密码生成器">
 
-    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
+  <title>Good Pass</title>
 
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
-    <!--<![endif]-->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" sizes="57x57" href="img/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="img/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="img/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="img/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="img/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="img/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="img/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="img/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="img/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
 
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-
-    <!--[if lte IE 8]>
-            <link rel="stylesheet" href="css/layouts/marketing-old-ie.css">
-        <![endif]-->
-    <!--[if gt IE 8]><!-->
-    <link rel="stylesheet" href="css/layouts/marketing.css">
-    <!--<![endif]-->
+  <link rel="stylesheet" href="css/mustard-ui.min.css">
+  <style type="text/css">
+    .alert-border {
+      border: 1px solid #42a5f5;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="header">
-        <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
-            <a class="pure-menu-heading" href="">Good Pass</a>
-        </div>
-    </div>
+  <header style="background: #ffc110;">
+    <h1 class="title">Good Pass</h1>
+    <h2 class="subtitle">好用的密码生成器</h2>
+    <p class="disclaimer">通过一个易于记忆的主体密码和网站的唯一标识为每个网站生成唯一且不能破解的密码</p>
+    <button class="get-started button button-primary button-large">开始</button>
 
-    <div class="splash-container">
-        <div class="splash">
-            <h1 class="splash-head">好用的密码生成器</h1>
-            <p class="splash-subhead">
-                通过一个主体密码和网站标识为每个网站生成唯一且便于记忆的密码
-            </p>
-            <p>
-                <a href="#content" class="pure-button pure-button-primary">开始</a>
-            </p>
-        </div>
-    </div>
+    <a class="scroll-down" href="#"></a>
+  </header>
 
-    <div class="content-wrapper">
-        <div class="content" id="content">
-            <div class="pure-g">
-                <div class="l-box-lrg pure-u-1">
-                    <form class="pure-form pure-form-stacked" id="form">
-                        <fieldset>
+  <section>
+    <form id="form">
+      <div class="form-control">
+        <label>密码前缀</label>
+        <input id="prefix" type="text" placeholder="">
+      </div>
 
-                            <label for="prefix">密码前缀</label>
-                            <input id="prefix" type="text" placeholder="">
+      <div class="form-control">
+        <label>主体密码</label>
+        <input id="pass" type="password" placeholder="简单易记即可">
+      </div>
 
+      <div class="form-control grow-2x">
+        <label>网站标识</label>
+        <input id="mark" type="text" placeholder="建议使用网站域名">
+      </div>
 
-                            <label for="pass">主体密码</label>
-                            <input id="pass" type="password" placeholder="">
+      <div class="form-control">
+        <label>密码后缀</label>
+        <input id="suffix" type="text" placeholder="">
+      </div>
 
-                            <label for="mark">网站标识</label>
-                            <input id="mark" type="text" placeholder="建议使用网站域名">
+      <div class="form-control">
+        <p id="generate" onclick="copy()" class="alert alert-info alert-border" style="text-align: center">
+          生成后点击复制
+        </p>
+      </div>
 
-                            <label for="suffix">密码后缀</label>
-                            <input id="suffix" type="text" placeholder="">
+      <div class="form-control">
+        <button type="submit" class="button-primary button-large" style="width: 100%">生成</button>
+      </div>
+    </form>
+  </section>
 
-                            <button type="submit" class="pure-button" style="width: 100%">生成</button>
-
-
-                            <p id="generate" onclick="copy()" style="font-size: 2em; line-height: 150%; border: solid 3px; text-align: center;">生成后点击复制</p>
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer l-box is-center">
-        </div>
-    </div>
-
-    <script type="text/javascript" src="./js/zepto.min.js"></script>
-    <script type="text/javascript" src="./js/md5.min.js"></script>
-    <script type="text/javascript">
-        function generate() {
-            debugger;
-            var prefix = strRemoveEmptyAndUpper($("#prefix").val());
-            var pass = strRemoveEmptyAndUpper($("#pass").val());
-            var mark = strRemoveEmptyAndUpper($("#mark").val());
-            var suffix = strRemoveEmptyAndUpper($("#suffix").val());
-
-            if (pass.length == 0) {
-                alert("主体密码不能为空");
-                return;
-            }
-
-            var genPass = prefix.toLowerCase() + "_" + md5("GP" + pass + mark).substring(0, 8).toUpperCase() + "_" + suffix.toLowerCase();
-            $("#generate").text(genPass);
-            $("#generate").val(genPass);
-        }
-
-        function copy() {
-            if ($("#generate").text() == "生成后点击复制") return;
-
-            var generate = document.querySelector('#generate');
-            var range = document.createRange();
-            range.selectNodeContents(generate);
-
-            var selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            try {
-                // Now that we've selected the anchor text, execute the copy command
-                var successful = document.execCommand('copy');
-                alert('复制' + (successful ? '成功' : '失败'));
-            } catch (err) {
-                console.log('Oops, unable to copy');
-            }
-
-            selection.removeAllRanges();
-        }
-
-        function strRemoveEmptyAndUpper(str) {
-            str = str.replace(/\s/g, "");       //去掉空格
-            str = str.replace(/[\r\n]/g, "");   //去掉回车换行
-            return str.toUpperCase();
-        }
-
-        function getUrlParams() {
-            var url = window.location.href;
-            var params = {};
-            (url + '?').split('?')[1].split('&').forEach(function (pair) {
-                pair = (pair + '=').split('=').map(decodeURIComponent);
-                if (pair[0].length) {
-                    params[pair[0]] = pair[1].split('#')[0];
-                }
-            });
-            return params;
-        }
-
-        $(function () {
-            var params = getUrlParams();
-
-            $("#prefix").val(params.prefix);
-            $("#suffix").val(params.suffix);
-            
-            $('#form').on('submit', function (e) {
-                e.preventDefault()
-                generate();
-            });
+  <script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="./js/md5.min.js"></script>
+  <script type="text/javascript">
+    if (navigator.serviceWorker != null) {
+      navigator.serviceWorker.register('sw.js')
+        .then(function (registration) {
+          console.log('Registered events at scope: ', registration.scope);
         });
-    </script>
+    }
+
+    $(function () {
+      $('.scroll-down, .get-started').on('click', function (e) {
+        e.preventDefault()
+        $('html, body').animate({
+          scrollTop: $('section:first-of-type').offset().top
+        }, 300)
+      })
+
+      var params = getUrlParams();
+
+      $("#prefix").val(params.prefix);
+      $("#suffix").val(params.suffix);
+
+      $('#form').on('submit', function (e) {
+        e.preventDefault()
+        generate();
+      });
+    });
+
+    function generate() {
+      debugger;
+      var prefix = strRemoveEmptyAndUpper($("#prefix").val());
+      var pass = strRemoveEmptyAndUpper($("#pass").val());
+      var mark = strRemoveEmptyAndUpper($("#mark").val());
+      var suffix = strRemoveEmptyAndUpper($("#suffix").val());
+
+      if (pass.length == 0) {
+        alert("主体密码不能为空");
+        return;
+      }
+
+      var genPass = prefix.toLowerCase() + "_" + md5("GP" + pass + mark).substring(0, 8).toUpperCase() + "_" + suffix.toLowerCase();
+      $("#generate").text(genPass);
+      $("#generate").val(genPass);
+    }
+
+    function copy() {
+      if ($("#generate").text() == "生成后点击复制") return;
+
+      var generate = document.querySelector('#generate');
+      var range = document.createRange();
+      range.selectNodeContents(generate);
+
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      try {
+        // Now that we've selected the anchor text, execute the copy command
+        var successful = document.execCommand('copy');
+        alert('复制' + (successful ? '成功' : '失败'));
+      } catch (err) {
+        console.log('Oops, unable to copy');
+      }
+
+      selection.removeAllRanges();
+    }
+
+    function strRemoveEmptyAndUpper(str) {
+      str = str.replace(/\s/g, "");       //去掉空格
+      str = str.replace(/[\r\n]/g, "");   //去掉回车换行
+      return str.toUpperCase();
+    }
+
+    function getUrlParams() {
+      var url = window.location.href;
+      var params = {};
+      (url + '?').split('?')[1].split('&').forEach(function (pair) {
+        pair = (pair + '=').split('=').map(decodeURIComponent);
+        if (pair[0].length) {
+          params[pair[0]] = pair[1].split('#')[0];
+        }
+      });
+      return params;
+    }
+  </script>
 </body>
 
 </html>
