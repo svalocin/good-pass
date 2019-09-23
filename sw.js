@@ -1,6 +1,6 @@
 
 console.log('Script loaded!')
-var cacheStorageKey = '9f2c3b61-0f1f-4a8a-b332-71a8ad2dc303_1.0.0'
+var cacheStorageKey = '9f2c3b61-0f1f-4a8a-b332-71a8ad2dc303_2.0.0'
 
 var cacheList = [
   '/',
