@@ -129,7 +129,7 @@
         }
 
         function copy() {
-            if ($("#generate").text() == "生成后点击复制") return;
+            if ($("#generate").text().trim() == "生成后点击复制") return;
 
             var generate = document.querySelector('#generate');
             var range = document.createRange();
