@@ -51,7 +51,7 @@
         <label>密码前缀</label>
         <input id="prefix" type="text" placeholder="">
       </div>
- 
+
       <div class="form-control">
         <label>主体密码</label>
         <input id="pass" type="password" class="invalid" placeholder="简单易记即可">
@@ -107,10 +107,10 @@
       $("#suffix").val(params.suffix);
 
       if (params.prefix == undefined || params.prefix == null || params.prefix.trim().length == 0) {
-        $("#prefix").val(getItem(prefix));
+        $("#prefix").val(getItem("prefix"));
       }
       if (params.suffix == undefined || params.suffix == null || params.suffix.trim().length == 0) {
-        $("#suffix").val(getItem(suffix));
+        $("#suffix").val(getItem("suffix"));
       }
 
       $('#form').on('submit', function (e) {
