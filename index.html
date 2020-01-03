@@ -121,17 +121,17 @@
 
     function generate() {
       debugger;
-      var prefix = strRemoveEmptyAndUpper($("#prefix").val());
+      var prefix = strRemoveEmptyAndUpper($("#prefix").val()).toLowerCase();
       var pass = strRemoveEmptyAndUpper($("#pass").val());
       var mark = strRemoveEmptyAndUpper($("#mark").val());
-      var suffix = strRemoveEmptyAndUpper($("#suffix").val());
+      var suffix = strRemoveEmptyAndUpper($("#suffix").val()).toLowerCase();
 
       if (pass.length == 0) {
         alert("主体密码不能为空");
         return;
       }
 
-      var genPass = prefix.toLowerCase() + "_" + md5("GP" + pass + mark).substring(0, 8).toUpperCase() + "_" + suffix.toLowerCase();
+      var genPass = prefix + "_" + md5("GP" + pass + mark).substring(0, 8).toUpperCase() + "_" + suffix;
       $("#generate").text(genPass);
       $("#generate").val(genPass);
 
