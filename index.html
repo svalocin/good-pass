@@ -32,7 +32,7 @@
     ::-webkit-scrollbar {
       display: none;
     }
-    
+
     .alert-border {
       border: 1px solid #42a5f5;
     }
@@ -69,6 +69,17 @@
       <div class="form-control">
         <label>密码后缀</label>
         <input id="suffix" type="text" placeholder="">
+      </div>
+
+      <div class="form-control">
+        <label>密码模式</label>
+        <select id="mode">
+          <option value="mixing" selected="selected">混合</option>
+          <option value="lower_mixing">小写混合</option>
+          <option value="letters_and_numbers">字母和数字</option>
+          <option value="lower_letters_and_numbers">小写字母和数字</option>
+          <option value="numbers">数字</option>
+        </select>
       </div>
 
       <div class="form-control">
@@ -124,18 +135,20 @@
     });
 
     function generate() {
-      debugger;
       var prefix = strRemoveEmptyAndUpper($("#prefix").val()).toLowerCase();
       var pass = strRemoveEmptyAndUpper($("#pass").val());
       var mark = strRemoveEmptyAndUpper($("#mark").val());
+      var mode = $("#mode").val();
       var suffix = strRemoveEmptyAndUpper($("#suffix").val()).toLowerCase();
+
+      debugger;
 
       if (pass.length == 0) {
         alert("主体密码不能为空");
         return;
       }
 
-      var genPass = prefix + "_" + md5("GP" + pass + mark).substring(0, 8).toUpperCase() + "_" + suffix;
+      var genPass = processPassword(mode, prefix, md5("GP" + pass + mark).substring(0, 8).toUpperCase(), suffix);
       $("#generate").text(genPass);
       $("#generate").val(genPass);
 
@@ -197,6 +210,42 @@
         if (value == undefined || value == null) value = "";
         localStorage.setItem(key, value);
       }
+    }
+
+    function processPassword(mode, prefix, generate, suffix) {
+      var lettersAndNumbers = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789";
+
+      if (mode == "mixing" || mode == "lower_mixing") {
+        generate = prefix + "_" + generate + "_" + suffix;
+      }
+
+      if (mode == "letters_and_numbers" || mode == "lower_letters_and_numbers") {
+        generate = prefix + "0" + generate + "9" + suffix;
+
+        var _generate = "";
+        for (let i = 0; i < generate.length; i++) {
+          var e = generate[i];
+          if (lettersAndNumbers.indexOf(e) > -1) {
+            _generate += e;
+          }
+        }
+        generate = _generate;
+      }
+
+      if (mode == "numbers") {
+        var _generate = "";
+        for (let i = 0; i < generate.length; i++) {
+          var e = generate[i];
+          _generate += (e.charCodeAt() % 10);
+        }
+        generate = _generate;
+      }
+
+      if (mode == "lower_mixing" || mode == "lower_letters_and_numbers") {
+        generate = generate.toLowerCase();
+      }
+
+      return generate;
     }
   </script>
 </body>
