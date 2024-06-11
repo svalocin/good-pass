@@ -36,6 +36,13 @@
     .alert-border {
       border: 1px solid #42a5f5;
     }
+
+    .toggle-password {
+    float: right;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: -25px;
+}
   </style>
 </head>
 
@@ -59,6 +66,7 @@
       <div class="form-control">
         <label>主体密码</label>
         <input id="pass" type="password" class="invalid" placeholder="简单易记即可">
+        <i class="toggle-password fa fa-fw fa-eye-slash"></i>
       </div>
 
       <div class="form-control grow-2x">
@@ -105,6 +113,16 @@
     }
 
     $(function () {
+$(".toggle-password").click(function() {
+    $(this).toggleClass("fa-eye fa-eye-slash");
+    input = $(this).parent().find("input");
+    if (input.attr("type") == "password") {
+        input.attr("type", "text");
+    } else {
+        input.attr("type", "password");
+    }
+});
+      
       $('.get-started').on('click', function (e) {
         e.preventDefault()
         $('html, body').animate({
