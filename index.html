@@ -32,10 +32,6 @@
     ::-webkit-scrollbar {
       display: none;
     }
-
-    .alert-border {
-      border: 1px solid #42a5f5;
-    }
   </style>
 </head>
 
@@ -59,6 +55,7 @@
       <div class="form-control">
         <label>主体密码</label>
         <input id="pass" type="password" class="invalid" placeholder="简单易记即可">
+        <p id="pass-val" class="validation-error" style="display: none;">主体密码不能为空</p>
       </div>
 
       <div class="form-control grow-2x">
@@ -87,7 +84,7 @@
       </div>
 
       <div class="form-control">
-        <p id="generate" onclick="copy()" class="alert alert-info alert-border" style="text-align: center">
+        <p id="generate" onclick="copy()" class="alert alert-info" style="text-align: center">
           生成后点击复制
         </p>
       </div>
@@ -135,17 +132,26 @@
     });
 
     function generate() {
+      $("#generate").text("生成后点击复制");
+      $("#generate")
+        .removeClass("alert-success")
+        .removeClass("alert-danger")
+        .removeClass("alert-info")
+        .addClass("alert-info");
+
+
       var prefix = strRemoveEmptyAndUpper($("#prefix").val()).toLowerCase();
       var pass = strRemoveEmptyAndUpper($("#pass").val());
       var mark = strRemoveEmptyAndUpper($("#mark").val());
       var mode = $("#mode").val();
       var suffix = strRemoveEmptyAndUpper($("#suffix").val()).toLowerCase();
 
-      debugger;
-
       if (pass.length == 0) {
-        alert("主体密码不能为空");
+        // alert("主体密码不能为空");
+        $("#pass-val").css("display", "block");
         return;
+      } else {
+        $("#pass-val").css("display", "none");
       }
 
       var genPass = processPassword(mode, prefix, md5("GP" + pass + mark).substring(0, 8).toUpperCase(), suffix);
@@ -170,7 +176,20 @@
       try {
         // Now that we've selected the anchor text, execute the copy command
         var successful = document.execCommand('copy');
-        alert('复制' + (successful ? '成功' : '失败'));
+        if (successful) {
+          $("#generate")
+            .removeClass("alert-success")
+            .removeClass("alert-danger")
+            .removeClass("alert-info")
+            .addClass("alert-success");
+        } else {
+          $("#generate")
+            .removeClass("alert-success")
+            .removeClass("alert-danger")
+            .removeClass("alert-info")
+            .addClass("alert-danger");
+        }
+        // alert('复制' + (successful ? '成功' : '失败'));
       } catch (err) {
         console.log('Oops, unable to copy');
       }
