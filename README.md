@@ -1,2 +1,8 @@
 # good-pass
+
 好用的密码生成器，通过一个易于记忆的主体密码和网站的唯一标识为每个网站生成唯一且不能破解的密码。
+
+```bash
+# 打包成单个文件
+pnpm dlx html-inline index.html > good-pass.html
+```

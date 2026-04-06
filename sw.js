@@ -1,4 +1,4 @@
-const CACHE_KEY = 'good-pass_v3.0.1';
+const CACHE_KEY = 'good-pass_v3.0.2';
 
 const CACHE_LIST = [
   '/',
