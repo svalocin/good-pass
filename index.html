@@ -348,14 +348,10 @@
     select option { background: var(--bg-card); color: var(--text-primary); }
 
     /* Field validation error */
-    .field-error {
-      display: none;
-      font-size: 12px;
-      color: var(--danger);
-      margin-top: 5px;
+    .input-error {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.15) !important;
     }
-
-    .field-error.show { display: block; }
 
     /* ===== Generate button ===== */
     .btn-generate {
@@ -756,9 +752,6 @@
             <span class="mask-countdown" id="mask-countdown"></span>
             <button type="button" class="input-eye-btn" id="eye-btn" aria-label="显示或隐藏密码">👁</button>
           </div>
-          <div class="field-error" id="pass-error" role="alert">
-            <span id="pass-error-text">主密码不能为空</span>
-          </div>
         </div>
 
         <div class="form-group">
@@ -766,9 +759,6 @@
           <div class="input-wrap">
             <input id="mark" type="text" placeholder="建议使用域名，如 github.com"
               autocomplete="off" inputmode="url" aria-required="true">
-          </div>
-          <div class="field-error" id="mark-error" role="alert">
-            <span id="mark-error-text">网站标识不能为空</span>
           </div>
         </div>
 
@@ -838,7 +828,7 @@
         labelPass: '主密码', labelMark: '网站标识', labelPrefix: '前缀', labelSuffix: '后缀', labelMode: '密码模式',
         passPlaceholder: '简单易记即可', markPlaceholder: '建议使用域名，如 github.com',
         optMixing: '混合（推荐）', optLowerMixing: '小写混合', optLn: '字母和数字', optLln: '小写字母和数字', optNumbers: '纯数字',
-        btnText: '生成密码', passError: '主密码不能为空', markError: '网站标识不能为空',
+        btnText: '生成密码',
         resultTag: '生成结果', resultHint: '点击复制', resultHintCopied: '已复制！', resultPlaceholder: '—',
         toastCopied: '✓ 已复制到剪贴板', toastFail: '复制失败，请手动选取',
         pwaTitle: '安装到主屏幕', pwaSub: '离线可用，随时使用',
@@ -857,7 +847,7 @@
         labelPass: '主密碼', labelMark: '網站識別碼', labelPrefix: '前綴', labelSuffix: '後綴', labelMode: '密碼模式',
         passPlaceholder: '簡單易記即可', markPlaceholder: '建議使用域名，如 github.com',
         optMixing: '混合（推薦）', optLowerMixing: '小寫混合', optLn: '字母和數字', optLln: '小寫字母和數字', optNumbers: '純數字',
-        btnText: '產生密碼', passError: '主密碼不能為空', markError: '網站識別碼不能為空',
+        btnText: '產生密碼',
         resultTag: '產生結果', resultHint: '點擊複製', resultHintCopied: '已複製！', resultPlaceholder: '—',
         toastCopied: '✓ 已複製到剪貼簿', toastFail: '複製失敗，請手動選取',
         pwaTitle: '加入主畫面', pwaSub: '離線可用，隨時使用',
@@ -876,7 +866,7 @@
         labelPass: 'Master Password', labelMark: 'Site Identifier', labelPrefix: 'Prefix', labelSuffix: 'Suffix', labelMode: 'Mode',
         passPlaceholder: 'Something easy to remember', markPlaceholder: 'e.g. github.com',
         optMixing: 'Mixed (Recommended)', optLowerMixing: 'Lowercase Mixed', optLn: 'Letters & Numbers', optLln: 'Lowercase Letters & Numbers', optNumbers: 'Numbers Only',
-        btnText: 'Generate Password', passError: 'Master password is required', markError: 'Site identifier is required',
+        btnText: 'Generate Password',
         resultTag: 'Result', resultHint: 'Tap to copy', resultHintCopied: 'Copied!', resultPlaceholder: '—',
         toastCopied: '✓ Copied to clipboard', toastFail: 'Copy failed, please select manually',
         pwaTitle: 'Add to Home Screen', pwaSub: 'Works offline, always ready',
@@ -895,7 +885,7 @@
         labelPass: 'マスターパスワード', labelMark: 'サイト識別子', labelPrefix: '接頭辞', labelSuffix: '接尾辞', labelMode: 'モード',
         passPlaceholder: '覚えやすいものを', markPlaceholder: '例: github.com',
         optMixing: '混合（推奨）', optLowerMixing: '小文字混合', optLn: '英数字', optLln: '小文字英数字', optNumbers: '数字のみ',
-        btnText: 'パスワード生成', passError: 'マスターパスワードを入力してください', markError: 'サイト識別子を入力してください',
+        btnText: 'パスワード生成',
         resultTag: '生成結果', resultHint: 'タップしてコピー', resultHintCopied: 'コピーしました！', resultPlaceholder: '—',
         toastCopied: '✓ クリップボードにコピーしました', toastFail: 'コピー失敗。手動で選択してください',
         pwaTitle: 'ホーム画面に追加', pwaSub: 'オフラインでも使用可能',
@@ -914,7 +904,7 @@
         labelPass: '마스터 비밀번호', labelMark: '사이트 식별자', labelPrefix: '접두사', labelSuffix: '접미사', labelMode: '모드',
         passPlaceholder: '기억하기 쉬운 것으로', markPlaceholder: '예: github.com',
         optMixing: '혼합 (권장)', optLowerMixing: '소문자 혼합', optLn: '영문자 및 숫자', optLln: '소문자 및 숫자', optNumbers: '숫자만',
-        btnText: '비밀번호 생성', passError: '마스터 비밀번호를 입력하세요', markError: '사이트 식별자를 입력하세요',
+        btnText: '비밀번호 생성',
         resultTag: '생성 결과', resultHint: '탭하여 복사', resultHintCopied: '복사됨!', resultPlaceholder: '—',
         toastCopied: '✓ 클립보드에 복사됨', toastFail: '복사 실패. 수동으로 선택하세요',
         pwaTitle: '홈 화면에 추가', pwaSub: '오프라인에서도 사용 가능',
@@ -933,7 +923,7 @@
         labelPass: 'Mot de passe maître', labelMark: 'Identifiant du site', labelPrefix: 'Préfixe', labelSuffix: 'Suffixe', labelMode: 'Mode',
         passPlaceholder: 'Quelque chose de facile à retenir', markPlaceholder: 'ex. github.com',
         optMixing: 'Mixte (Recommandé)', optLowerMixing: 'Minuscules mixtes', optLn: 'Lettres & Chiffres', optLln: 'Minuscules & Chiffres', optNumbers: 'Chiffres uniquement',
-        btnText: 'Générer le mot de passe', passError: 'Le mot de passe maître est requis', markError: "L'identifiant du site est requis",
+        btnText: 'Générer le mot de passe',
         resultTag: 'Résultat', resultHint: 'Appuyer pour copier', resultHintCopied: 'Copié !', resultPlaceholder: '—',
         toastCopied: '✓ Copié dans le presse-papiers', toastFail: 'Échec de la copie, veuillez sélectionner manuellement',
         pwaTitle: "Ajouter à l'écran d'accueil", pwaSub: 'Fonctionne hors ligne, toujours prêt',
@@ -952,7 +942,7 @@
         labelPass: 'Master-Passwort', labelMark: 'Website-Kennung', labelPrefix: 'Präfix', labelSuffix: 'Suffix', labelMode: 'Modus',
         passPlaceholder: 'Etwas Leichtes zu Merkendes', markPlaceholder: 'z.B. github.com',
         optMixing: 'Gemischt (Empfohlen)', optLowerMixing: 'Kleinbuchstaben Gemischt', optLn: 'Buchstaben & Zahlen', optLln: 'Kleinbuchstaben & Zahlen', optNumbers: 'Nur Zahlen',
-        btnText: 'Passwort generieren', passError: 'Master-Passwort ist erforderlich', markError: 'Website-Kennung ist erforderlich',
+        btnText: 'Passwort generieren',
         resultTag: 'Ergebnis', resultHint: 'Tippen zum Kopieren', resultHintCopied: 'Kopiert!', resultPlaceholder: '—',
         toastCopied: '✓ In Zwischenablage kopiert', toastFail: 'Kopieren fehlgeschlagen, bitte manuell auswählen',
         pwaTitle: 'Zum Startbildschirm hinzufügen', pwaSub: 'Offline verfügbar, immer bereit',
@@ -971,7 +961,7 @@
         labelPass: 'Contraseña maestra', labelMark: 'Identificador del sitio', labelPrefix: 'Prefijo', labelSuffix: 'Sufijo', labelMode: 'Modo',
         passPlaceholder: 'Algo fácil de recordar', markPlaceholder: 'ej. github.com',
         optMixing: 'Mixto (Recomendado)', optLowerMixing: 'Minúsculas mixtas', optLn: 'Letras y números', optLln: 'Minúsculas y números', optNumbers: 'Solo números',
-        btnText: 'Generar contraseña', passError: 'La contraseña maestra es obligatoria', markError: 'El identificador del sitio es obligatorio',
+        btnText: 'Generar contraseña',
         resultTag: 'Resultado', resultHint: 'Toca para copiar', resultHintCopied: '¡Copiado!', resultPlaceholder: '—',
         toastCopied: '✓ Copiado al portapapeles', toastFail: 'Error al copiar, seleccione manualmente',
         pwaTitle: 'Añadir a la pantalla de inicio', pwaSub: 'Funciona sin conexión, siempre listo',
@@ -1029,8 +1019,6 @@
         'label-suffix':     l.labelSuffix,
         'label-mode':       l.labelMode,
         'btn-text':         l.btnText,
-        'pass-error-text':  l.passError,
-        'mark-error-text':  l.markError,
         'result-tag-text':  l.resultTag,
         'pwa-title':        l.pwaTitle,
         'pwa-sub':          l.pwaSub,
@@ -1132,16 +1120,16 @@
     }
 
     /* ===== Form validation helpers ===== */
-    function setFieldError(id, show) {
-      document.getElementById(id).classList.toggle('show', show);
+    function setFieldError(inputId, show) {
+      document.getElementById(inputId).classList.toggle('input-error', show);
     }
 
     document.getElementById('pass').addEventListener('input', function () {
-      if (this.value) setFieldError('pass-error', false);
+      if (this.value) setFieldError('pass', false);
     });
 
     document.getElementById('mark').addEventListener('input', function () {
-      if (this.value) setFieldError('mark-error', false);
+      if (this.value) setFieldError('mark', false);
     });
 
     /* ===== Password generation ===== */
@@ -1171,8 +1159,8 @@
       const markVal = document.getElementById('mark').value;
       const passOk  = passVal.trim() !== '';
       const markOk  = markVal.trim() !== '';
-      setFieldError('pass-error', !passOk);
-      setFieldError('mark-error', !markOk);
+      setFieldError('pass', !passOk);
+      setFieldError('mark', !markOk);
       if (!passOk || !markOk) return;
 
       const prefix = sanitize(document.getElementById('prefix').value).toLowerCase();
