@@ -1,14 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-theme="light">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="msapplication-TileColor" content="#ffc110">
   <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-  <meta name="theme-color" content="#ffc110">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="好用的密码生成器">
+  <meta name="theme-color" content="#ffc110" id="meta-theme-color">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Good Pass">
+  <meta name="description" content="通过主密码和网站标识，为每个网站生成唯一且安全的密码">
 
   <title>Good Pass</title>
 
@@ -27,245 +29,1318 @@
   <link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
   <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
 
-  <link rel="stylesheet" href="css/mustard-ui.min.css">
-  <style type="text/css">
-    ::-webkit-scrollbar {
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== Design Tokens ===== */
+    :root {
+      --yellow:        #ffc110;
+      --yellow-dark:   #e6a800;
+      --yellow-deeper: #cc9600;
+      --yellow-pale:   #fff8e0;
+      --yellow-muted:  rgba(255, 193, 16, 0.15);
+      --yellow-border: rgba(255, 193, 16, 0.35);
+      --success:       #22a35a;
+      --success-bg:    #edfbf3;
+      --danger:        #d93025;
+      --radius:        14px;
+      --radius-sm:     10px;
+      --transition:    0.2s ease;
+      --max-width:     480px;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg:             #f7f5f0;
+      --bg-card:        #ffffff;
+      --bg-input:       #f4f2ed;
+      --bg-input-focus: #ffffff;
+      --border:         #e8e4da;
+      --border-focus:   var(--yellow-dark);
+      --text-primary:   #1a1a1a;
+      --text-secondary: #555;
+      --text-muted:     #999;
+      --shadow:         0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-btn:     0 2px 8px rgba(230, 168, 0, 0.35);
+      --divider:        #ede9df;
+    }
+
+    [data-theme="dark"] {
+      --bg:             #1a1812;
+      --bg-card:        #252219;
+      --bg-input:       #1e1b14;
+      --bg-input-focus: #252219;
+      --border:         #3a3628;
+      --border-focus:   var(--yellow);
+      --text-primary:   #f0ead8;
+      --text-secondary: #b0a888;
+      --text-muted:     #6e6650;
+      --shadow:         0 2px 16px rgba(0,0,0,0.4);
+      --shadow-btn:     0 2px 12px rgba(255, 193, 16, 0.25);
+      --divider:        #2e2a1f;
+      --yellow-pale:    rgba(255, 193, 16, 0.08);
+      --success-bg:     rgba(34, 163, 90, 0.12);
+    }
+
+    /* ===== Reset ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    ::-webkit-scrollbar { display: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ===== Layout ===== */
+    .app-wrapper {
+      width: 100%;
+      max-width: var(--max-width);
+      min-height: 100dvh;
+      padding: 20px 16px 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ===== Header ===== */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 4px 6px;
+    }
+
+    .app-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-logo-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .app-logo-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .app-logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 2px;
+      line-height: 1;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== Icon button (theme toggle) ===== */
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      background: var(--yellow-muted);
+      border-color: var(--yellow-border);
+      color: var(--yellow-deeper);
+    }
+
+    /* ===== Language select ===== */
+    .lang-select {
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0 28px 0 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      letter-spacing: 0.3px;
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+
+    .lang-select:hover {
+      background-color: var(--yellow-muted);
+      border-color: var(--yellow-border);
+      color: var(--yellow-deeper);
+    }
+
+    .lang-select:focus { outline: 2px solid var(--yellow); outline-offset: 2px; }
+
+    /* ===== Description banner ===== */
+    .desc-banner {
+      background: var(--yellow-pale);
+      border: 1px solid var(--yellow-border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ===== Card ===== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* ===== Form ===== */
+    .form-group { margin-bottom: 14px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .input-wrap { position: relative; }
+
+    input[type="text"],
+    input[type="password"],
+    select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: var(--font);
+      outline: none;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    select:focus {
+      background: var(--bg-input-focus);
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(255, 193, 16, 0.18);
+    }
+
+    input::placeholder { color: var(--text-muted); }
+
+    /* Password field eye toggle */
+    .input-has-btn input { padding-right: 80px; }
+
+    .input-eye-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1;
+      transition: color var(--transition);
+    }
+
+    .input-eye-btn:hover { color: var(--text-secondary); }
+
+    .mask-countdown {
+      position: absolute;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .mask-countdown.show { opacity: 1; }
+
+    /* Select dropdown arrow */
+    .select-wrap { position: relative; }
+
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--text-muted);
+      pointer-events: none;
+    }
+
+    select { padding-right: 36px; cursor: pointer; }
+    select option { background: var(--bg-card); color: var(--text-primary); }
+
+    /* Field validation error */
+    .field-error {
       display: none;
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 5px;
+    }
+
+    .field-error.show { display: block; }
+
+    /* ===== Generate button ===== */
+    .btn-generate {
+      width: 100%;
+      background: var(--yellow);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 13px;
+      color: #1a1a1a;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: background var(--transition), box-shadow var(--transition), transform 0.1s;
+      box-shadow: var(--shadow-btn);
+      letter-spacing: 0.2px;
+    }
+
+    .btn-generate:hover {
+      background: var(--yellow-dark);
+      box-shadow: 0 4px 14px rgba(230, 168, 0, 0.45);
+    }
+
+    .btn-generate:active {
+      transform: scale(0.99);
+      box-shadow: none;
+    }
+
+    /* ===== Result card ===== */
+    .result-card {
+      border-radius: var(--radius);
+      border: 1.5px dashed var(--border);
+      padding: 18px 20px;
+      cursor: default;
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .result-card.has-result {
+      border-style: solid;
+      border-color: var(--yellow-border);
+      background: var(--yellow-pale);
+      cursor: pointer;
+    }
+
+    .result-card.has-result:hover {
+      border-color: var(--yellow-dark);
+      box-shadow: 0 2px 10px rgba(255, 193, 16, 0.15);
+    }
+
+    .result-card.copied {
+      border-color: rgba(34, 163, 90, 0.4);
+      background: var(--success-bg);
+    }
+
+    .result-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .result-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-muted);
+    }
+
+    .result-tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: background var(--transition);
+    }
+
+    .has-result .result-tag-dot { background: var(--yellow-dark); }
+    .copied .result-tag-dot     { background: var(--success); }
+
+    .result-copy-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: color var(--transition);
+    }
+
+    .has-result .result-copy-hint { color: var(--yellow-deeper); }
+    .copied .result-copy-hint     { color: var(--success); }
+
+    .result-value {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 10px 0 6px;
+      font-family: var(--font-mono);
+      transition: color var(--transition);
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-value.is-placeholder {
+      font-size: 14px;
+      font-family: var(--font);
+      letter-spacing: 0;
+      font-weight: 400;
+    }
+
+    .has-result .result-value { color: var(--text-primary); }
+    .copied .result-value     { color: var(--success); }
+
+    /* ===== Toast ===== */
+    .toast-wrap {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--text-primary);
+      color: var(--bg-card);
+      border-radius: 100px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      animation: toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .toast.out { animation: toast-out 0.2s ease forwards; }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(-10px) scale(0.92); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to   { opacity: 0; transform: translateY(-6px) scale(0.95); }
+    }
+
+    /* ===== PWA install banner (Android/Chrome) ===== */
+    .pwa-banner {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--yellow-border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .pwa-banner.show  { display: flex; }
+    .pwa-banner:hover { background: var(--yellow-pale); }
+
+    .pwa-icon { font-size: 22px; flex-shrink: 0; }
+
+    .pwa-text { flex: 1; }
+
+    .pwa-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .pwa-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .pwa-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      transition: color var(--transition);
+    }
+
+    .pwa-close:hover { color: var(--text-primary); }
+
+    /* ===== iOS install guide modal ===== */
+    .ios-modal-mask {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1000;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      animation: mask-in 0.25s ease forwards;
+    }
+
+    .ios-modal-mask.show { display: flex; }
+
+    @keyframes mask-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .ios-modal {
+      width: 100%;
+      max-width: var(--max-width);
+      background: var(--bg-card);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+      animation: sheet-up 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+    }
+
+    @keyframes sheet-up {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    .ios-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .ios-modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .ios-modal-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-input);
+      color: var(--text-muted);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .ios-modal-close:hover { background: var(--border); color: var(--text-primary); }
+
+    .ios-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .ios-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .ios-step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--yellow);
+      color: #1a1a1a;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .ios-step-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .ios-step-text strong { color: var(--text-primary); font-weight: 600; }
+
+    .ios-step-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      margin: 0 2px;
+      font-style: normal;
+    }
+
+    .ios-arrow {
+      display: block;
+      width: 20px;
+      height: 20px;
+      margin: 6px auto 0 34px;
+      opacity: 0.3;
+    }
+
+    /* ===== Footer ===== */
+    .app-footer {
+      margin-top: auto;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding-top: 4px;
+      line-height: 1.6;
+    }
+
+    /* ===== Focus ring ===== */
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--yellow);
+      outline-offset: 2px;
+    }
+
+    /* ===== Responsive ===== */
+    @media (min-width: 520px) {
+      .app-wrapper { padding: 32px 0 60px; }
+      .card        { padding: 24px; }
+    }
+
+    @media (max-width: 360px) {
+      .form-row    { grid-template-columns: 1fr; }
+      .result-value { font-size: 20px; letter-spacing: 2px; }
     }
   </style>
 </head>
 
-<body style="background: #ffc110;">
-  <header style="background: #ffc110;">
-    <h1 class="title">Good Pass</h1>
-    <h2 class="subtitle">好用的密码生成器</h2>
-    <p class="disclaimer">通过一个易于记忆的主体密码和网站的唯一标识为每个网站生成唯一且不能破解的密码</p>
-    <button class="get-started button button-primary button-large">开始</button>
+<body>
+  <div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
 
-    <a class="scroll-down" href="#"></a>
-  </header>
+  <main class="app-wrapper" role="main">
 
-  <section style="background: white;">
-    <form id="form">
-      <div class="form-control">
-        <label>密码前缀</label>
-        <input id="prefix" type="text" placeholder="">
+    <header class="app-header">
+      <div class="app-logo">
+        <img class="app-logo-img" src="img/apple-icon-180x180.png" alt="Good Pass logo">
+        <div>
+          <div class="app-logo-title">Good Pass</div>
+          <div class="app-logo-sub" id="header-sub">安全密码生成器</div>
+        </div>
       </div>
-
-      <div class="form-control">
-        <label>主体密码</label>
-        <input id="pass" type="password" class="invalid" placeholder="简单易记即可">
-        <p id="pass-val" class="validation-error" style="display: none;">主体密码不能为空</p>
+      <div class="header-controls">
+        <select class="lang-select" id="lang-select" aria-label="选择语言"></select>
+        <button class="icon-btn" id="theme-btn" aria-label="切换主题">🌙</button>
       </div>
+    </header>
 
-      <div class="form-control grow-2x">
-        <label>网站标识</label>
-        <input id="mark" type="text" class="invalid" placeholder="建议使用网站域名">
+    <div class="desc-banner" role="note">
+      <span id="hero-text">通过易记的主密码＋网站标识，为每个网站生成独一无二的强密码。密码在本地计算，不存储、不上传。</span>
+    </div>
+
+    <div class="pwa-banner" id="pwa-banner">
+      <span class="pwa-icon">📲</span>
+      <div class="pwa-text">
+        <div class="pwa-title" id="pwa-title">安装到主屏幕</div>
+        <div class="pwa-sub"   id="pwa-sub">离线可用，随时使用</div>
       </div>
+      <button class="pwa-close" id="pwa-close" aria-label="关闭">×</button>
+    </div>
 
-      <div class="form-control">
-        <label>密码后缀</label>
-        <input id="suffix" type="text" placeholder="">
+    <!-- iOS install guide modal -->
+    <div class="ios-modal-mask" id="ios-modal-mask" role="dialog" aria-modal="true" aria-labelledby="ios-modal-title">
+      <div class="ios-modal">
+        <div class="ios-modal-header">
+          <span class="ios-modal-title" id="ios-modal-title">添加到主屏幕</span>
+          <button class="ios-modal-close" id="ios-modal-close" aria-label="关闭">✕</button>
+        </div>
+        <div class="ios-steps" id="ios-steps">
+          <!-- steps injected by JS -->
+        </div>
       </div>
+    </div>
 
-      <div class="form-control">
-        <label>密码模式</label>
-        <select id="mode">
-          <option value="mixing" selected="selected">混合</option>
-          <option value="lower_mixing">小写混合</option>
-          <option value="letters_and_numbers">字母和数字</option>
-          <option value="lower_letters_and_numbers">小写字母和数字</option>
-          <option value="numbers">数字</option>
-        </select>
+    <div class="card">
+      <div class="card-label" id="card-label">密码配置</div>
+
+      <form id="form" novalidate>
+
+        <div class="form-group">
+          <label for="pass" id="label-pass">主密码</label>
+          <div class="input-wrap input-has-btn">
+            <input id="pass" type="password" placeholder="简单易记即可"
+              autocomplete="current-password" aria-required="true">
+            <span class="mask-countdown" id="mask-countdown"></span>
+            <button type="button" class="input-eye-btn" id="eye-btn" aria-label="显示或隐藏密码">👁</button>
+          </div>
+          <div class="field-error" id="pass-error" role="alert">
+            <span id="pass-error-text">主密码不能为空</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="mark" id="label-mark">网站标识</label>
+          <div class="input-wrap">
+            <input id="mark" type="text" placeholder="建议使用域名，如 github.com"
+              autocomplete="off" inputmode="url" aria-required="true">
+          </div>
+          <div class="field-error" id="mark-error" role="alert">
+            <span id="mark-error-text">网站标识不能为空</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-row">
+            <div>
+              <label for="prefix" id="label-prefix">前缀</label>
+              <input id="prefix" type="text" autocomplete="off">
+            </div>
+            <div>
+              <label for="suffix" id="label-suffix">后缀</label>
+              <input id="suffix" type="text" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="mode" id="label-mode">密码模式</label>
+          <div class="select-wrap">
+            <select id="mode">
+              <option value="mixing"                  id="opt-mixing">混合（推荐）</option>
+              <option value="lower_mixing"             id="opt-lower-mixing">小写混合</option>
+              <option value="letters_and_numbers"      id="opt-ln">字母和数字</option>
+              <option value="lower_letters_and_numbers" id="opt-lln">小写字母和数字</option>
+              <option value="numbers"                  id="opt-numbers">纯数字</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:6px">
+          <button type="submit" class="btn-generate" id="btn-generate">
+            <span id="btn-text">生成密码</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="result-card" id="result-card"
+      role="button" tabindex="0" aria-label="点击复制密码"
+      onclick="copyPass()" onkeydown="if(event.key==='Enter'||event.key===' ')copyPass()">
+      <div class="result-meta">
+        <span class="result-tag">
+          <span class="result-tag-dot"></span>
+          <span id="result-tag-text">生成结果</span>
+        </span>
+        <span class="result-copy-hint" id="result-hint-text">点击复制</span>
       </div>
+      <div class="result-value is-placeholder" id="result-value">—</div>
+    </div>
 
-      <div class="form-control">
-        <button type="submit" class="button-primary button-large" style="width: 100%; margin-left: 0px;">生成</button>
-      </div>
+    <footer class="app-footer">
+      <span id="footer-text">密码在本地生成，不会上传或储存</span>
+    </footer>
 
-      <div class="form-control">
-        <p id="generate" onclick="copy()" class="alert alert-info" style="text-align: center">
-          生成后点击复制
-        </p>
-      </div>
-    </form>
-  </section>
+  </main>
 
-  <script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
-  <script type="text/javascript" src="./js/md5.min.js"></script>
-  <script type="text/javascript">
-    if (navigator.serviceWorker != null) {
-      navigator.serviceWorker.register('sw.js')
-        .then(function (registration) {
-          console.log('Registered events at scope: ', registration.scope);
-        });
+  <script src="./js/md5.min.js"></script>
+  <script>
+    /* ===== i18n ===== */
+    const LANG = {
+      zh: {
+        htmlLang: 'zh-CN',
+        headerSub: '安全密码生成器',
+        hero: '通过易记的主密码＋网站标识，为每个网站生成独一无二的强密码。密码在本地计算，不存储、不上传。',
+        cardLabel: '密码配置',
+        labelPass: '主密码', labelMark: '网站标识', labelPrefix: '前缀', labelSuffix: '后缀', labelMode: '密码模式',
+        passPlaceholder: '简单易记即可', markPlaceholder: '建议使用域名，如 github.com',
+        optMixing: '混合（推荐）', optLowerMixing: '小写混合', optLn: '字母和数字', optLln: '小写字母和数字', optNumbers: '纯数字',
+        btnText: '生成密码', passError: '主密码不能为空', markError: '网站标识不能为空',
+        resultTag: '生成结果', resultHint: '点击复制', resultHintCopied: '已复制！', resultPlaceholder: '—',
+        toastCopied: '✓ 已复制到剪贴板', toastFail: '复制失败，请手动选取',
+        pwaTitle: '安装到主屏幕', pwaSub: '离线可用，随时使用',
+        iosModalTitle: '添加到主屏幕',
+        iosStep1: '点击底部工具栏的<strong>分享</strong>按钮<i class="ios-step-icon">⬆️</i>',
+        iosStep2: '向下滚动，选择<strong>添加到主屏幕</strong>',
+        iosStep3: '点击右上角<strong>添加</strong>完成安装',
+        footer: '密码在本地生成，不会上传或储存',
+        langLabel: '中文',
+      },
+      'zh-TW': {
+        htmlLang: 'zh-TW',
+        headerSub: '安全密碼產生器',
+        hero: '透過易記的主密碼＋網站識別碼，為每個網站產生獨一無二的強密碼。密碼在本地計算，不儲存、不上傳。',
+        cardLabel: '密碼設定',
+        labelPass: '主密碼', labelMark: '網站識別碼', labelPrefix: '前綴', labelSuffix: '後綴', labelMode: '密碼模式',
+        passPlaceholder: '簡單易記即可', markPlaceholder: '建議使用域名，如 github.com',
+        optMixing: '混合（推薦）', optLowerMixing: '小寫混合', optLn: '字母和數字', optLln: '小寫字母和數字', optNumbers: '純數字',
+        btnText: '產生密碼', passError: '主密碼不能為空', markError: '網站識別碼不能為空',
+        resultTag: '產生結果', resultHint: '點擊複製', resultHintCopied: '已複製！', resultPlaceholder: '—',
+        toastCopied: '✓ 已複製到剪貼簿', toastFail: '複製失敗，請手動選取',
+        pwaTitle: '加入主畫面', pwaSub: '離線可用，隨時使用',
+        iosModalTitle: '加入主畫面',
+        iosStep1: '點擊底部工具列的<strong>分享</strong>按鈕<i class="ios-step-icon">⬆️</i>',
+        iosStep2: '向下捲動，選擇<strong>加入主畫面</strong>',
+        iosStep3: '點擊右上角<strong>新增</strong>完成安裝',
+        footer: '密碼在本地產生，不會上傳或儲存',
+        langLabel: '繁中',
+      },
+      en: {
+        htmlLang: 'en',
+        headerSub: 'Secure Password Generator',
+        hero: 'Generate a unique strong password for every site using a memorable master password + site identifier. Computed locally, nothing is stored or uploaded.',
+        cardLabel: 'Configuration',
+        labelPass: 'Master Password', labelMark: 'Site Identifier', labelPrefix: 'Prefix', labelSuffix: 'Suffix', labelMode: 'Mode',
+        passPlaceholder: 'Something easy to remember', markPlaceholder: 'e.g. github.com',
+        optMixing: 'Mixed (Recommended)', optLowerMixing: 'Lowercase Mixed', optLn: 'Letters & Numbers', optLln: 'Lowercase Letters & Numbers', optNumbers: 'Numbers Only',
+        btnText: 'Generate Password', passError: 'Master password is required', markError: 'Site identifier is required',
+        resultTag: 'Result', resultHint: 'Tap to copy', resultHintCopied: 'Copied!', resultPlaceholder: '—',
+        toastCopied: '✓ Copied to clipboard', toastFail: 'Copy failed, please select manually',
+        pwaTitle: 'Add to Home Screen', pwaSub: 'Works offline, always ready',
+        iosModalTitle: 'Add to Home Screen',
+        iosStep1: 'Tap the <strong>Share</strong> button<i class="ios-step-icon">⬆️</i> in the toolbar',
+        iosStep2: 'Scroll down and tap <strong>Add to Home Screen</strong>',
+        iosStep3: 'Tap <strong>Add</strong> in the top right to finish',
+        footer: 'Passwords generated locally, never uploaded or stored',
+        langLabel: 'EN',
+      },
+      ja: {
+        htmlLang: 'ja',
+        headerSub: 'セキュアパスワード生成器',
+        hero: '覚えやすいマスターパスワード＋サイト識別子で、各サイト専用の強力なパスワードを生成。ローカルで計算、保存・送信なし。',
+        cardLabel: 'パスワード設定',
+        labelPass: 'マスターパスワード', labelMark: 'サイト識別子', labelPrefix: '接頭辞', labelSuffix: '接尾辞', labelMode: 'モード',
+        passPlaceholder: '覚えやすいものを', markPlaceholder: '例: github.com',
+        optMixing: '混合（推奨）', optLowerMixing: '小文字混合', optLn: '英数字', optLln: '小文字英数字', optNumbers: '数字のみ',
+        btnText: 'パスワード生成', passError: 'マスターパスワードを入力してください', markError: 'サイト識別子を入力してください',
+        resultTag: '生成結果', resultHint: 'タップしてコピー', resultHintCopied: 'コピーしました！', resultPlaceholder: '—',
+        toastCopied: '✓ クリップボードにコピーしました', toastFail: 'コピー失敗。手動で選択してください',
+        pwaTitle: 'ホーム画面に追加', pwaSub: 'オフラインでも使用可能',
+        iosModalTitle: 'ホーム画面に追加',
+        iosStep1: 'ツールバーの<strong>共有</strong>ボタン<i class="ios-step-icon">⬆️</i>をタップ',
+        iosStep2: '下にスクロールして<strong>ホーム画面に追加</strong>を選択',
+        iosStep3: '右上の<strong>追加</strong>をタップして完了',
+        footer: 'パスワードはローカルで生成、送信・保存なし',
+        langLabel: '日本語',
+      },
+      ko: {
+        htmlLang: 'ko',
+        headerSub: '안전한 비밀번호 생성기',
+        hero: '기억하기 쉬운 마스터 비밀번호＋사이트 식별자로 각 사이트마다 고유한 강력한 비밀번호를 생성합니다. 로컬에서 계산, 저장·전송 없음.',
+        cardLabel: '비밀번호 설정',
+        labelPass: '마스터 비밀번호', labelMark: '사이트 식별자', labelPrefix: '접두사', labelSuffix: '접미사', labelMode: '모드',
+        passPlaceholder: '기억하기 쉬운 것으로', markPlaceholder: '예: github.com',
+        optMixing: '혼합 (권장)', optLowerMixing: '소문자 혼합', optLn: '영문자 및 숫자', optLln: '소문자 및 숫자', optNumbers: '숫자만',
+        btnText: '비밀번호 생성', passError: '마스터 비밀번호를 입력하세요', markError: '사이트 식별자를 입력하세요',
+        resultTag: '생성 결과', resultHint: '탭하여 복사', resultHintCopied: '복사됨!', resultPlaceholder: '—',
+        toastCopied: '✓ 클립보드에 복사됨', toastFail: '복사 실패. 수동으로 선택하세요',
+        pwaTitle: '홈 화면에 추가', pwaSub: '오프라인에서도 사용 가능',
+        iosModalTitle: '홈 화면에 추가',
+        iosStep1: '툴바의 <strong>공유</strong> 버튼<i class="ios-step-icon">⬆️</i>을 탭하세요',
+        iosStep2: '아래로 스크롤하여 <strong>홈 화면에 추가</strong>를 선택하세요',
+        iosStep3: '오른쪽 상단의 <strong>추가</strong>를 탭하여 완료하세요',
+        footer: '비밀번호는 로컬에서 생성, 업로드 또는 저장 안 함',
+        langLabel: '한국어',
+      },
+      fr: {
+        htmlLang: 'fr',
+        headerSub: 'Générateur de mots de passe sécurisé',
+        hero: "Générez un mot de passe unique et fort pour chaque site avec un mot de passe maître mémorable + identifiant de site. Calculé localement, rien n'est stocké ni envoyé.",
+        cardLabel: 'Configuration',
+        labelPass: 'Mot de passe maître', labelMark: 'Identifiant du site', labelPrefix: 'Préfixe', labelSuffix: 'Suffixe', labelMode: 'Mode',
+        passPlaceholder: 'Quelque chose de facile à retenir', markPlaceholder: 'ex. github.com',
+        optMixing: 'Mixte (Recommandé)', optLowerMixing: 'Minuscules mixtes', optLn: 'Lettres & Chiffres', optLln: 'Minuscules & Chiffres', optNumbers: 'Chiffres uniquement',
+        btnText: 'Générer le mot de passe', passError: 'Le mot de passe maître est requis', markError: "L'identifiant du site est requis",
+        resultTag: 'Résultat', resultHint: 'Appuyer pour copier', resultHintCopied: 'Copié !', resultPlaceholder: '—',
+        toastCopied: '✓ Copié dans le presse-papiers', toastFail: 'Échec de la copie, veuillez sélectionner manuellement',
+        pwaTitle: "Ajouter à l'écran d'accueil", pwaSub: 'Fonctionne hors ligne, toujours prêt',
+        iosModalTitle: "Ajouter à l'écran d'accueil",
+        iosStep1: "Appuyez sur le bouton <strong>Partager</strong><i class=\"ios-step-icon\">⬆️</i> dans la barre d'outils",
+        iosStep2: "Faites défiler vers le bas et sélectionnez <strong>Sur l'écran d'accueil</strong>",
+        iosStep3: "Appuyez sur <strong>Ajouter</strong> en haut à droite pour terminer",
+        footer: 'Mots de passe générés localement, jamais envoyés ni stockés',
+        langLabel: 'FR',
+      },
+      de: {
+        htmlLang: 'de',
+        headerSub: 'Sicherer Passwortgenerator',
+        hero: 'Generieren Sie für jede Website ein einzigartiges starkes Passwort mit einem einprägsamen Master-Passwort + Website-Kennung. Lokal berechnet, nichts wird gespeichert oder übertragen.',
+        cardLabel: 'Konfiguration',
+        labelPass: 'Master-Passwort', labelMark: 'Website-Kennung', labelPrefix: 'Präfix', labelSuffix: 'Suffix', labelMode: 'Modus',
+        passPlaceholder: 'Etwas Leichtes zu Merkendes', markPlaceholder: 'z.B. github.com',
+        optMixing: 'Gemischt (Empfohlen)', optLowerMixing: 'Kleinbuchstaben Gemischt', optLn: 'Buchstaben & Zahlen', optLln: 'Kleinbuchstaben & Zahlen', optNumbers: 'Nur Zahlen',
+        btnText: 'Passwort generieren', passError: 'Master-Passwort ist erforderlich', markError: 'Website-Kennung ist erforderlich',
+        resultTag: 'Ergebnis', resultHint: 'Tippen zum Kopieren', resultHintCopied: 'Kopiert!', resultPlaceholder: '—',
+        toastCopied: '✓ In Zwischenablage kopiert', toastFail: 'Kopieren fehlgeschlagen, bitte manuell auswählen',
+        pwaTitle: 'Zum Startbildschirm hinzufügen', pwaSub: 'Offline verfügbar, immer bereit',
+        iosModalTitle: 'Zum Startbildschirm hinzufügen',
+        iosStep1: 'Tippen Sie auf die <strong>Teilen</strong>-Schaltfläche<i class="ios-step-icon">⬆️</i> in der Symbolleiste',
+        iosStep2: 'Nach unten scrollen und <strong>Zum Home-Bildschirm</strong> auswählen',
+        iosStep3: 'Oben rechts auf <strong>Hinzufügen</strong> tippen, um abzuschließen',
+        footer: 'Passwörter werden lokal generiert, nie hochgeladen oder gespeichert',
+        langLabel: 'DE',
+      },
+      es: {
+        htmlLang: 'es',
+        headerSub: 'Generador de contraseñas seguras',
+        hero: 'Genera una contraseña única y fuerte para cada sitio usando una contraseña maestra memorable + identificador de sitio. Calculado localmente, nada se almacena ni se envía.',
+        cardLabel: 'Configuración',
+        labelPass: 'Contraseña maestra', labelMark: 'Identificador del sitio', labelPrefix: 'Prefijo', labelSuffix: 'Sufijo', labelMode: 'Modo',
+        passPlaceholder: 'Algo fácil de recordar', markPlaceholder: 'ej. github.com',
+        optMixing: 'Mixto (Recomendado)', optLowerMixing: 'Minúsculas mixtas', optLn: 'Letras y números', optLln: 'Minúsculas y números', optNumbers: 'Solo números',
+        btnText: 'Generar contraseña', passError: 'La contraseña maestra es obligatoria', markError: 'El identificador del sitio es obligatorio',
+        resultTag: 'Resultado', resultHint: 'Toca para copiar', resultHintCopied: '¡Copiado!', resultPlaceholder: '—',
+        toastCopied: '✓ Copiado al portapapeles', toastFail: 'Error al copiar, seleccione manualmente',
+        pwaTitle: 'Añadir a la pantalla de inicio', pwaSub: 'Funciona sin conexión, siempre listo',
+        iosModalTitle: 'Añadir a la pantalla de inicio',
+        iosStep1: 'Toca el botón <strong>Compartir</strong><i class="ios-step-icon">⬆️</i> en la barra de herramientas',
+        iosStep2: 'Desplázate hacia abajo y selecciona <strong>Añadir a inicio</strong>',
+        iosStep3: 'Toca <strong>Añadir</strong> en la esquina superior derecha para finalizar',
+        footer: 'Contraseñas generadas localmente, nunca se suben ni almacenan',
+        langLabel: 'ES',
+      },
+    };
+
+    /* ===== State ===== */
+    let currentLang  = localStorage.getItem('gp-lang') || detectBrowserLang();
+    let currentTheme = localStorage.getItem('gp-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    let generatedPass = '';
+    let passVisible   = false;
+    let maskTimer     = null;
+
+    /* ===== Lang detection ===== */
+    function detectBrowserLang() {
+      const langs = navigator.languages || [navigator.language || 'en'];
+      const keys  = Object.keys(LANG);
+      for (const nl of langs) {
+        const lower  = nl.toLowerCase();
+        const exact  = keys.find(k => k.toLowerCase() === lower);
+        if (exact) return exact;
+        const prefix = lower.split('-')[0];
+        if (prefix === 'zh') {
+          return (lower.includes('tw') || lower.includes('hk') || lower.includes('mo') || lower.includes('hant'))
+            ? 'zh-TW' : 'zh';
+        }
+        const prefixMatch = keys.find(k => k.toLowerCase().startsWith(prefix));
+        if (prefixMatch) return prefixMatch;
+      }
+      return 'en';
     }
 
-    $(function () {
-      $('.get-started').on('click', function (e) {
-        e.preventDefault()
-        $('html, body').animate({
-          scrollTop: $('section:first-of-type').offset().top
-        }, 300)
-      });
+    /* ===== i18n apply ===== */
+    function t(key) {
+      return LANG[currentLang][key] ?? '';
+    }
 
-      $(".scroll-down").on('click', function (e) {
-        $('html, body').animate({ scrollTop: 0 }, 300);
-      });
+    function applyLang() {
+      const l = LANG[currentLang];
+      document.documentElement.lang = l.htmlLang;
 
-      var params = getUrlParams();
-
-      $("#prefix").val(params.prefix);
-      $("#suffix").val(params.suffix);
-
-      if (params.prefix == undefined || params.prefix == null || params.prefix.trim().length == 0) {
-        $("#prefix").val(getItem("prefix"));
+      const textMap = {
+        'header-sub':       l.headerSub,
+        'hero-text':        l.hero,
+        'card-label':       l.cardLabel,
+        'label-pass':       l.labelPass,
+        'label-mark':       l.labelMark,
+        'label-prefix':     l.labelPrefix,
+        'label-suffix':     l.labelSuffix,
+        'label-mode':       l.labelMode,
+        'btn-text':         l.btnText,
+        'pass-error-text':  l.passError,
+        'mark-error-text':  l.markError,
+        'result-tag-text':  l.resultTag,
+        'pwa-title':        l.pwaTitle,
+        'pwa-sub':          l.pwaSub,
+        'ios-modal-title':  l.iosModalTitle,
+        'footer-text':      l.footer,
+      };
+      for (const [id, text] of Object.entries(textMap)) {
+        document.getElementById(id).textContent = text;
       }
-      if (params.suffix == undefined || params.suffix == null || params.suffix.trim().length == 0) {
-        $("#suffix").val(getItem("suffix"));
+
+      document.getElementById('pass').placeholder = l.passPlaceholder;
+      document.getElementById('mark').placeholder = l.markPlaceholder;
+
+      const optMap = {
+        'opt-mixing':       l.optMixing,
+        'opt-lower-mixing': l.optLowerMixing,
+        'opt-ln':           l.optLn,
+        'opt-lln':          l.optLln,
+        'opt-numbers':      l.optNumbers,
+      };
+      for (const [id, text] of Object.entries(optMap)) {
+        document.getElementById(id).textContent = text;
       }
 
-      $('#form').on('submit', function (e) {
-        e.preventDefault()
-        generate();
-      });
+      document.getElementById('lang-select').value = currentLang;
+
+      if (!generatedPass) {
+        document.getElementById('result-hint-text').textContent = l.resultHint;
+        document.getElementById('result-value').textContent     = l.resultPlaceholder;
+      }
+
+      // Refresh iOS modal steps if modal is open
+      if (document.getElementById('ios-modal-mask').classList.contains('show')) {
+        buildIosSteps();
+      }
+    }
+
+    function buildLangOptions() {
+      const sel = document.getElementById('lang-select');
+      sel.innerHTML = Object.entries(LANG)
+        .map(([k, v]) => `<option value="${k}">${v.langLabel}</option>`)
+        .join('');
+    }
+
+    /* ===== Theme ===== */
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      document.getElementById('theme-btn').textContent    = currentTheme === 'dark' ? '☀️' : '🌙';
+      document.getElementById('meta-theme-color').content = currentTheme === 'dark' ? '#1a1812' : '#ffc110';
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('gp-theme', currentTheme);
+      applyTheme();
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('gp-theme')) {
+        currentTheme = e.matches ? 'dark' : 'light';
+        applyTheme();
+      }
     });
 
-    function generate() {
-      $("#generate").text("生成后点击复制");
-      $("#generate")
-        .removeClass("alert-success")
-        .removeClass("alert-danger")
-        .removeClass("alert-info")
-        .addClass("alert-info");
-
-
-      var prefix = strRemoveEmptyAndUpper($("#prefix").val()).toLowerCase();
-      var pass = strRemoveEmptyAndUpper($("#pass").val());
-      var mark = strRemoveEmptyAndUpper($("#mark").val());
-      var mode = $("#mode").val();
-      var suffix = strRemoveEmptyAndUpper($("#suffix").val()).toLowerCase();
-
-      if (pass.length == 0) {
-        // alert("主体密码不能为空");
-        $("#pass-val").css("display", "block");
-        return;
+    /* ===== Password visibility ===== */
+    function togglePass() {
+      passVisible = !passVisible;
+      document.getElementById('pass').type    = passVisible ? 'text' : 'password';
+      document.getElementById('eye-btn').textContent = passVisible ? '🙈' : '👁';
+      if (passVisible) {
+        startMaskCountdown(3);
       } else {
-        $("#pass-val").css("display", "none");
+        clearMaskCountdown();
       }
-
-      var genPass = processPassword(mode, prefix, md5("GP" + pass + mark).substring(0, 8).toUpperCase(), suffix);
-      $("#generate").text(genPass);
-      $("#generate").val(genPass);
-
-      setItem("prefix", prefix);
-      setItem("suffix", suffix);
     }
 
-    function copy() {
-      if ($("#generate").text().trim() == "生成后点击复制") return;
+    function startMaskCountdown(secs) {
+      clearMaskCountdown();
+      let n  = secs;
+      const el = document.getElementById('mask-countdown');
+      el.textContent = n;
+      el.classList.add('show');
+      maskTimer = setInterval(() => {
+        n--;
+        el.textContent = n;
+        if (n <= 0) {
+          clearMaskCountdown();
+          document.getElementById('pass').type = 'password';
+          document.getElementById('eye-btn').textContent = '👁';
+          passVisible = false;
+        }
+      }, 1000);
+    }
 
-      var generate = document.querySelector('#generate');
-      var range = document.createRange();
-      range.selectNodeContents(generate);
+    function clearMaskCountdown() {
+      if (maskTimer) { clearInterval(maskTimer); maskTimer = null; }
+      const el = document.getElementById('mask-countdown');
+      el.classList.remove('show');
+    }
 
-      var selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
+    /* ===== Form validation helpers ===== */
+    function setFieldError(id, show) {
+      document.getElementById(id).classList.toggle('show', show);
+    }
 
+    document.getElementById('pass').addEventListener('input', function () {
+      if (this.value) setFieldError('pass-error', false);
+    });
+
+    document.getElementById('mark').addEventListener('input', function () {
+      if (this.value) setFieldError('mark-error', false);
+    });
+
+    /* ===== Password generation ===== */
+    function sanitize(str) {
+      return str.replace(/[\s\r\n]/g, '').toUpperCase();
+    }
+
+    function processPassword(mode, prefix, core, suffix) {
+      const alphaNum = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789';
+      let result;
+      if (mode === 'numbers') {
+        result = core.split('').map(c => c.charCodeAt(0) % 10).join('');
+      } else if (mode === 'letters_and_numbers' || mode === 'lower_letters_and_numbers') {
+        result = (prefix + '0' + core + '9' + suffix).split('').filter(c => alphaNum.includes(c)).join('');
+      } else {
+        result = prefix + '_' + core + '_' + suffix;
+      }
+      if (mode === 'lower_mixing' || mode === 'lower_letters_and_numbers') {
+        result = result.toLowerCase();
+      }
+      return result;
+    }
+
+    document.getElementById('form').addEventListener('submit', e => {
+      e.preventDefault();
+      const passVal = document.getElementById('pass').value;
+      const markVal = document.getElementById('mark').value;
+      const passOk  = passVal.trim() !== '';
+      const markOk  = markVal.trim() !== '';
+      setFieldError('pass-error', !passOk);
+      setFieldError('mark-error', !markOk);
+      if (!passOk || !markOk) return;
+
+      const prefix = sanitize(document.getElementById('prefix').value).toLowerCase();
+      const suffix = sanitize(document.getElementById('suffix').value).toLowerCase();
+      const core   = md5('GP' + sanitize(passVal) + sanitize(markVal)).substring(0, 8).toUpperCase();
+      const mode   = document.getElementById('mode').value;
+
+      generatedPass = processPassword(mode, prefix, core, suffix);
+
+      const card  = document.getElementById('result-card');
+      const valEl = document.getElementById('result-value');
+      card.classList.remove('copied');
+      card.classList.add('has-result');
+      valEl.classList.remove('is-placeholder');
+      valEl.textContent = generatedPass;
+      document.getElementById('result-hint-text').textContent = t('resultHint');
+
+      try { localStorage.setItem('prefix', prefix); } catch {}
+      try { localStorage.setItem('suffix', suffix); } catch {}
+    });
+
+    /* ===== Copy ===== */
+    async function copyPass() {
+      if (!generatedPass) return;
       try {
-        // Now that we've selected the anchor text, execute the copy command
-        var successful = document.execCommand('copy');
-        if (successful) {
-          $("#generate")
-            .removeClass("alert-success")
-            .removeClass("alert-danger")
-            .removeClass("alert-info")
-            .addClass("alert-success");
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(generatedPass);
         } else {
-          $("#generate")
-            .removeClass("alert-success")
-            .removeClass("alert-danger")
-            .removeClass("alert-info")
-            .addClass("alert-danger");
+          const ta = document.createElement('textarea');
+          ta.value = generatedPass;
+          ta.style.cssText = 'position:fixed;top:-999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
         }
-        // alert('复制' + (successful ? '成功' : '失败'));
-      } catch (err) {
-        console.log('Oops, unable to copy');
+        const card = document.getElementById('result-card');
+        card.classList.add('has-result', 'copied');
+        document.getElementById('result-hint-text').textContent = t('resultHintCopied');
+        showToast(t('toastCopied'));
+        setTimeout(() => {
+          card.classList.remove('copied');
+          document.getElementById('result-hint-text').textContent = t('resultHint');
+        }, 2000);
+      } catch {
+        showToast(t('toastFail'));
       }
-
-      selection.removeAllRanges();
     }
 
-    function strRemoveEmptyAndUpper(str) {
-      str = str.replace(/\s/g, "");       //去掉空格
-      str = str.replace(/[\r\n]/g, "");   //去掉回车换行
-      return str.toUpperCase();
+    /* ===== Toast ===== */
+    function showToast(msg) {
+      const el = document.createElement('div');
+      el.className  = 'toast';
+      el.textContent = msg;
+      document.getElementById('toast-wrap').appendChild(el);
+      setTimeout(() => {
+        el.classList.add('out');
+        setTimeout(() => el.remove(), 250);
+      }, 2000);
     }
 
+    /* ===== PWA ===== */
+    let deferredPrompt = null;
+
+    const isStandalone  = () => window.matchMedia('(display-mode: standalone)').matches
+                              || window.navigator.standalone === true;
+    const isIOS         = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isSafariBrowser = () => /safari/i.test(navigator.userAgent) && !/chrome|crios|fxios/i.test(navigator.userAgent);
+    const isDismissed   = () => !!localStorage.getItem('gp-pwa-dismissed');
+
+    // Android / Chrome — native install prompt
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!isDismissed()) {
+        document.getElementById('pwa-banner').classList.add('show');
+      }
+    });
+
+    document.getElementById('pwa-banner').addEventListener('click', async e => {
+      if (e.target.id === 'pwa-close') return;
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('pwa-banner').classList.remove('show');
+      if (outcome === 'accepted') {
+        localStorage.setItem('gp-pwa-dismissed', '1');
+      }
+    });
+
+    document.getElementById('pwa-close').addEventListener('click', () => {
+      document.getElementById('pwa-banner').classList.remove('show');
+      localStorage.setItem('gp-pwa-dismissed', '1');
+    });
+
+    // iOS Safari — manual guide modal
+    function buildIosSteps() {
+      const l = LANG[currentLang];
+      const steps = [l.iosStep1, l.iosStep2, l.iosStep3];
+      document.getElementById('ios-steps').innerHTML = steps
+        .map((text, i) => `
+          <div class="ios-step">
+            <span class="ios-step-num">${i + 1}</span>
+            <span class="ios-step-text">${text}</span>
+          </div>`)
+        .join('');
+    }
+
+    function showIosModal() {
+      buildIosSteps();
+      document.getElementById('ios-modal-mask').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideIosModal() {
+      document.getElementById('ios-modal-mask').classList.remove('show');
+      document.body.style.overflow = '';
+      localStorage.setItem('gp-pwa-dismissed', '1');
+    }
+
+    document.getElementById('ios-modal-close').addEventListener('click', hideIosModal);
+    document.getElementById('ios-modal-mask').addEventListener('click', e => {
+      if (e.target === document.getElementById('ios-modal-mask')) hideIosModal();
+    });
+
+    /* ===== Event wiring ===== */
+    document.getElementById('eye-btn').addEventListener('click', togglePass);
+    document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+    document.getElementById('lang-select').addEventListener('change', function () {
+      currentLang = this.value;
+      localStorage.setItem('gp-lang', currentLang);
+      applyLang();
+    });
+
+    /* ===== URL params ===== */
     function getUrlParams() {
-      var url = window.location.href;
-      var params = {};
-      (url + '?').split('?')[1].split('&').forEach(function (pair) {
-        pair = (pair + '=').split('=').map(decodeURIComponent);
-        if (pair[0].length) {
-          params[pair[0]] = pair[1].split('#')[0];
-        }
-      });
-      return params;
+      const p = {};
+      try {
+        (location.href + '?').split('?')[1].split('&').forEach(pair => {
+          const parts = (pair + '=').split('=').map(decodeURIComponent);
+          if (parts[0]) p[parts[0]] = parts[1].split('#')[0];
+        });
+      } catch {}
+      return p;
     }
 
-    function getItem(key, defaultValue) {
-      if (window.localStorage != undefined && window.localStorage != null) {
-        let value = localStorage.getItem(key);
-        if (value != undefined && value != null) return value;
+    /* ===== Init ===== */
+    (function init() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
       }
 
-      return defaultValue == undefined || defaultValue == null ? "" : defaultValue;
-    }
+      const params = getUrlParams();
+      const savedPrefix = params.prefix ?? (() => { try { return localStorage.getItem('prefix') || ''; } catch { return ''; } })();
+      const savedSuffix = params.suffix ?? (() => { try { return localStorage.getItem('suffix') || ''; } catch { return ''; } })();
+      document.getElementById('prefix').value = savedPrefix;
+      document.getElementById('suffix').value = savedSuffix;
 
-    function setItem(key, value) {
-      if (window.localStorage != undefined && window.localStorage != null) {
-        if (value == undefined || value == null) value = "";
-        localStorage.setItem(key, value);
+      buildLangOptions();
+      applyTheme();
+      applyLang();
+
+      // iOS Safari: show install guide after a short delay if not yet installed/dismissed
+      if (isIOS() && isSafariBrowser() && !isStandalone() && !isDismissed()) {
+        setTimeout(showIosModal, 2000);
       }
-    }
-
-    function processPassword(mode, prefix, generate, suffix) {
-      var lettersAndNumbers = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789";
-
-      if (mode == "mixing" || mode == "lower_mixing") {
-        generate = prefix + "_" + generate + "_" + suffix;
-      }
-
-      if (mode == "letters_and_numbers" || mode == "lower_letters_and_numbers") {
-        generate = prefix + "0" + generate + "9" + suffix;
-
-        var _generate = "";
-        for (let i = 0; i < generate.length; i++) {
-          var e = generate[i];
-          if (lettersAndNumbers.indexOf(e) > -1) {
-            _generate += e;
-          }
-        }
-        generate = _generate;
-      }
-
-      if (mode == "numbers") {
-        var _generate = "";
-        for (let i = 0; i < generate.length; i++) {
-          var e = generate[i];
-          _generate += (e.charCodeAt() % 10);
-        }
-        generate = _generate;
-      }
-
-      if (mode == "lower_mixing" || mode == "lower_letters_and_numbers") {
-        generate = generate.toLowerCase();
-      }
-
-      return generate;
-    }
+    })();
   </script>
 </body>
 
